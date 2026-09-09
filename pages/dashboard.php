@@ -41,7 +41,7 @@ $prestasiTerbaru = array_slice($prestasiTerbaru, 0, 5);
         }
 
         /* ===== SIDEBAR (Hijau Sage Solid + Border Putih) ===== */
-        #sidebar-wrapper {<link rel="icon" type="image/png" href="../assets/img/icon-1.png" sizes="32x32">
+        #sidebar-wrapper {
             min-height: 100vh;
             width: 250px;
             flex-shrink: 0;
@@ -103,6 +103,11 @@ $prestasiTerbaru = array_slice($prestasiTerbaru, 0, 5);
             border-left: 3px solid #FFD700;
             color: #fff;
             font-weight: 600;
+        }
+
+        #sidebar-wrapper .list-group-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
         }
 
         /* ===== LOGOUT SELALU MERAH ===== */
