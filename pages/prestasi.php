@@ -10,6 +10,9 @@ $message = '';
 $messageType = '';
 $dataEdit = null;
 
+// ============================================================
+// PROSES TAMBAH
+// ============================================================
 if (isset($_POST['tambah'])) {
     $id_pemuda = (int)$_POST['id_pemuda'];
     $id_kategori = (int)$_POST['id_kategori'];
@@ -17,45 +20,49 @@ if (isset($_POST['tambah'])) {
     $tingkat = sanitize($_POST['tingkat']);
     $penyelenggara = sanitize($_POST['penyelenggara']);
     $tahun = (int)$_POST['tahun'];
-    
+
     $sql = "INSERT INTO tb_prestasi (id_pemuda, id_kategori, nama_prestasi, tingkat, penyelenggara, tahun) 
             VALUES ($id_pemuda, $id_kategori, '$nama_prestasi', '$tingkat', '$penyelenggara', $tahun)";
-    
+
     if (mysqli_query($conn, $sql)) {
         $id_prestasi = mysqli_insert_id($conn);
         $pemuda = getPemuda($id_pemuda);
-        
+
         $sertifikatData = [
-            'id_prestasi' => $id_prestasi,
+            'id_prestasi'   => $id_prestasi,
             'nama_prestasi' => $nama_prestasi,
-            'nama_pemuda' => $pemuda['nama_pemuda'],
-            'tingkat' => $tingkat,
+            'nama_pemuda'   => $pemuda['nama_pemuda'],
+            'tingkat'       => $tingkat,
             'penyelenggara' => $penyelenggara,
-            'tahun' => $tahun,
-            'bukti' => ''
+            'tahun'         => $tahun,
+            'bukti'         => ''
         ];
-        
+
         $id_sertifikat = createSertifikat($sertifikatData);
-        
+
         if ($id_sertifikat) {
-            $update = "UPDATE tb_prestasi SET id_sertifikat = $id_sertifikat WHERE id_prestasi = $id_prestasi";
-            mysqli_query($conn, $update);
+            mysqli_query($conn, "UPDATE tb_prestasi SET id_sertifikat = $id_sertifikat WHERE id_prestasi = $id_prestasi");
         }
-        
-        $_SESSION['success_message'] = 'Data prestasi berhasil ditambahkan!';
+
+        $_SESSION['success_message'] = 'Data prestasi berhasil ditambahkan! Silakan download sertifikat.';
         redirect('sertifikat.php?id=' . $id_prestasi);
-        
     } else {
         $message = 'Gagal menambahkan data: ' . mysqli_error($conn);
         $messageType = 'danger';
     }
 }
 
+// ============================================================
+// PROSES EDIT
+// ============================================================
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
     $dataEdit = getPrestasi($id);
 }
 
+// ============================================================
+// PROSES UPDATE
+// ============================================================
 if (isset($_POST['update'])) {
     $id = (int)$_POST['id_prestasi'];
     $id_pemuda = (int)$_POST['id_pemuda'];
@@ -65,7 +72,7 @@ if (isset($_POST['update'])) {
     $penyelenggara = sanitize($_POST['penyelenggara']);
     $tahun = (int)$_POST['tahun'];
     $id_sertifikat = isset($_POST['id_sertifikat']) ? (int)$_POST['id_sertifikat'] : 0;
-    
+
     $sql = "UPDATE tb_prestasi SET 
             id_pemuda = $id_pemuda, 
             id_kategori = $id_kategori, 
@@ -74,21 +81,21 @@ if (isset($_POST['update'])) {
             penyelenggara = '$penyelenggara', 
             tahun = $tahun
             WHERE id_prestasi = $id";
-    
+
     if (mysqli_query($conn, $sql)) {
         if ($id_sertifikat > 0) {
             $pemuda = getPemuda($id_pemuda);
             $sertifikatData = [
                 'nama_prestasi' => $nama_prestasi,
-                'nama_pemuda' => $pemuda['nama_pemuda'],
-                'tingkat' => $tingkat,
+                'nama_pemuda'   => $pemuda['nama_pemuda'],
+                'tingkat'       => $tingkat,
                 'penyelenggara' => $penyelenggara,
-                'tahun' => $tahun,
-                'bukti' => $_POST['bukti_lama'] ?? ''
+                'tahun'         => $tahun,
+                'bukti'         => $_POST['bukti_lama'] ?? ''
             ];
             updateSertifikat($id_sertifikat, $sertifikatData);
         }
-        
+
         $message = 'Data prestasi berhasil diupdate!';
         $messageType = 'success';
         $dataEdit = null;
@@ -98,20 +105,26 @@ if (isset($_POST['update'])) {
     }
 }
 
+// ============================================================
+// PROSES HAPUS
+// ============================================================
 if (isset($_GET['hapus'])) {
     $id = (int)$_GET['hapus'];
     $data = getPrestasi($id);
-    
-    if ($data && $data['id_sertifikat']) {
+
+    if ($data && !empty($data['id_sertifikat'])) {
         $sertifikat = getSertifikat($data['id_sertifikat']);
-        if ($sertifikat && !empty($sertifikat['bukti']) && file_exists('../uploads/bukti/' . $sertifikat['bukti'])) {
-            unlink('../uploads/bukti/' . $sertifikat['bukti']);
+        if ($sertifikat && !empty($sertifikat['bukti'])) {
+            $fileBukti = '../uploads/bukti/' . $sertifikat['bukti'];
+            if (file_exists($fileBukti)) {
+                unlink($fileBukti);
+            }
         }
         deleteSertifikat($data['id_sertifikat']);
     }
-    
+
     $sql = "DELETE FROM tb_prestasi WHERE id_prestasi = $id";
-    
+
     if (mysqli_query($conn, $sql)) {
         $message = 'Data prestasi dan sertifikat berhasil dihapus!';
         $messageType = 'success';
@@ -121,11 +134,20 @@ if (isset($_GET['hapus'])) {
     }
 }
 
+// ============================================================
+// AMBIL DATA
+// ============================================================
 $prestasiList = getPrestasi();
 $pemudaList = getPemudaList();
 $kategoriList = getKategoriList();
 $nama_user = $_SESSION['nama'] ?? 'Admin';
 $isEdit = isset($dataEdit) && $dataEdit !== null;
+
+if (isset($_SESSION['success_message'])) {
+    $message = $_SESSION['success_message'];
+    $messageType = 'success';
+    unset($_SESSION['success_message']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -156,7 +178,6 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             border-right: 2px solid #fff;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
-
         .sidebar-heading {
             padding: 30px 20px !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -165,32 +186,27 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             align-items: center;
             justify-content: center;
         }
-
         .sidebar-logo {
             width: 150px;
             height: auto;
             margin-bottom: 15px;
             overflow: hidden;
         }
-
         .sidebar-logo img {
             width: 100%;
             height: auto;
             display: block;
         }
-
         .sidebar-heading h6 {
             font-weight: 700;
             color: #fff;
             margin-bottom: 2px;
             font-size: 1.2rem;
         }
-
         .sidebar-heading small {
             color: rgba(255, 255, 255, 0.7);
             font-size: 0.8rem;
         }
-
         #sidebar-wrapper .list-group-item {
             border: none;
             padding: 15px 20px;
@@ -200,14 +216,12 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             transition: all 0.3s;
             font-weight: 500;
         }
-
         #sidebar-wrapper .list-group-item.active {
             background: rgba(255, 255, 255, 0.2);
             border-left: 3px solid #FFD700;
             color: #fff;
             font-weight: 600;
         }
-
         #sidebar-wrapper .list-group-item.text-danger {
             color: #ff4d4d;
             font-weight: 600;
@@ -219,7 +233,6 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             padding: 15px 20px !important;
         }
-
         .navbar h5 {
             font-weight: 700;
             color: #6B8F71;
@@ -242,13 +255,11 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             background-color: rgba(247, 244, 237, 0.7) !important;
             border-bottom: 2px solid #6B8F71;
         }
-
         .table td {
             vertical-align: middle;
             font-size: 0.9rem;
             background-color: transparent;
         }
-
         .table-hover tbody tr:hover {
             background-color: rgba(107, 143, 113, 0.08) !important;
         }
@@ -258,42 +269,34 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             border-color: #6B8F71 !important;
             color: #fff !important;
         }
-
         .btn-primary:hover {
             background-color: #5A7A5F !important;
             border-color: #5A7A5F !important;
         }
-
         .btn-outline-primary {
             color: #6B8F71 !important;
             border-color: #6B8F71 !important;
         }
-
         .btn-outline-primary:hover {
             background-color: #6B8F71 !important;
             color: #fff !important;
         }
-
         .btn-success {
             background-color: #28a745 !important;
             border-color: #28a745 !important;
         }
-
         .btn-success:hover {
             background-color: #218838 !important;
             border-color: #1e7e34 !important;
         }
-
         .btn-outline-danger {
             border: 1px solid #dc3545 !important;
             color: #dc3545;
         }
-
         .btn-outline-danger:hover {
             background-color: #dc3545 !important;
             color: #fff !important;
         }
-
         .btn-action {
             padding: 7px 10px !important;
             font-size: 0.85rem;
@@ -304,7 +307,6 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             margin: 0 !important;
             line-height: 1;
         }
-
         .icon-circle {
             width: 32px;
             height: 32px;
@@ -324,8 +326,7 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             align-items: center;
             gap: 4px;
         }
-
-        .bukti-card .bukti-thumb-pdf {
+        .bukti-card .bukti-thumb {
             width: 35px;
             height: 35px;
             border-radius: 6px;
@@ -339,18 +340,11 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             color: #dc3545;
             font-size: 1.2rem;
         }
-
-        .bukti-card .bukti-thumb-pdf:hover {
+        .bukti-card .bukti-thumb:hover {
             transform: scale(1.1);
             box-shadow: 0 4px 15px rgba(107, 143, 113, 0.3);
             border-color: #6B8F71;
             background: #fff;
-        }
-
-        .bukti-card .btn-sm {
-            padding: 2px 6px;
-            font-size: 0.7rem;
-            border-radius: 4px;
         }
 
         .modal-content {
@@ -358,28 +352,23 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             border: none;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
-
         .modal-dialog-scrollable .modal-content {
             max-height: calc(100vh - 3.5rem);
         }
-
         .modal-content > form {
             display: flex;
             flex: 1 1 auto;
             flex-direction: column;
             min-height: 0;
         }
-
         .modal-header {
             border-bottom: 2px solid #6B8F71;
             padding: 15px 20px;
         }
-
         .modal-body {
             padding: 20px;
             overflow-y: auto;
         }
-
         .modal-footer {
             border-top: 1px solid #dee2e6;
             padding: 15px 20px;
@@ -395,36 +384,30 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             background-color: rgba(255, 255, 255, 0.95) !important;
             border: 2px solid rgba(107, 143, 113, 0.3) !important;
             border-radius: 16px !important;
-            box-shadow: 0 20px 60px rgba(107, 143, 113, 0.2);
         }
-
         .modal-detail-bukti .modal-header {
             border-bottom: 2px solid #6B8F71;
             padding: 15px 20px;
             background-color: rgba(107, 143, 113, 0.05) !important;
             border-radius: 14px 14px 0 0;
         }
-
         .modal-detail-bukti .modal-title {
             color: #2D3E30;
             font-weight: 600;
         }
-
         .modal-detail-bukti .modal-body {
-            padding: 20px;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 400px;
-            background-color: rgba(255, 255, 255, 0.5) !important;
+            background-color: #f8f9fa !important;
         }
-
         .modal-detail-bukti .modal-body iframe {
             width: 100%;
             height: 75vh;
             border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            background: white;
         }
 
         @media (max-width: 768px) {
@@ -448,6 +431,7 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
 <body>
 
     <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
         <div class="sidebar text-white" id="sidebar-wrapper">
             <div class="sidebar-heading text-center">
                 <div class="sidebar-logo">
@@ -477,6 +461,7 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             </div>
         </div>
 
+        <!-- Page Content -->
         <div id="page-content-wrapper" class="w-100">
             <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4">
                 <div class="d-flex align-items-center">
@@ -504,6 +489,7 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             </nav>
 
             <div class="container-fluid px-4 py-4">
+                <!-- Toolbar -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="bg-white p-3 rounded-4 shadow-sm">
@@ -529,15 +515,12 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
                 <?php if ($message): ?>
                     <div class="row mb-3">
                         <div class="col-12">
-                            <div class="alert alert-<?= $messageType ?> alert-dismissible fade show" role="alert">
-                                <i class="bi bi-<?= $messageType == 'success' ? 'check-circle' : 'exclamation-circle' ?> me-2"></i>
-                                <?= $message ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
+                            <?= showAlert($message, $messageType) ?>
                         </div>
                     </div>
                 <?php endif; ?>
 
+                <!-- Tabel Prestasi -->
                 <div class="row">
                     <div class="col-12">
                         <div class="bg-white rounded-4 shadow-sm">
@@ -557,7 +540,7 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
                                                 <th>No. Sertifikat</th>
                                                 <th>Tingkat</th>
                                                 <th>Tahun</th>
-                                                <th style="width: 130px;">Bukti</th>
+                                                <th style="width: 140px;">Bukti</th>
                                                 <th style="width: 130px;">Aksi</th>
                                             </tr>
                                         </thead>
@@ -600,20 +583,42 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
                                                 </td>
                                                 <td><span class="badge bg-secondary rounded-pill"><?= htmlspecialchars($p['tingkat']) ?></span></td>
                                                 <td><span class="badge bg-dark rounded-pill"><?= $p['tahun'] ?></span></td>
+
+                                                <!-- KOLOM BUKTI -->
                                                 <td>
-                                                    <?php if (!empty($p['bukti_sertifikat']) && file_exists('../uploads/bukti/' . $p['bukti_sertifikat'])): ?>
+                                                    <?php 
+                                                    $buktiFile = trim($p['bukti_sertifikat'] ?? '');
+                                                    $buktiPath = '../uploads/bukti/' . $buktiFile;
+                                                    $fileExists = !empty($buktiFile) && file_exists($buktiPath);
+                                                    ?>
+                                                    
+                                                    <?php if ($fileExists): ?>
                                                         <div class="bukti-card">
-                                                            <div class="bukti-thumb-pdf" onclick="detailBukti('<?= $p['bukti_sertifikat'] ?>')" title="Klik untuk melihat detail">
-                                                                <i class="bi bi-file-pdf"></i>
+                                                            <div class="bukti-thumb" 
+                                                                 onclick="detailBukti('<?= htmlspecialchars($buktiFile, ENT_QUOTES) ?>')" 
+                                                                 title="Klik untuk melihat detail">
+                                                                <i class="bi bi-file-earmark-text"></i>
                                                             </div>
-                                                            <a href="../uploads/bukti/<?= $p['bukti_sertifikat'] ?>" download="<?= $p['bukti_sertifikat'] ?>" class="btn btn-sm btn-outline-primary" title="Download">
+                                                            <a href="<?= htmlspecialchars($buktiPath) ?>" 
+                                                               download="<?= htmlspecialchars($buktiFile) ?>" 
+                                                               class="btn btn-sm btn-outline-primary" 
+                                                               title="Download">
                                                                 <i class="bi bi-download"></i>
                                                             </a>
                                                         </div>
+                                                    <?php elseif (!empty($buktiFile)): ?>
+                                                        <span class="text-warning small" title="File tercatat di database tapi tidak ada di server">
+                                                            <i class="bi bi-exclamation-triangle"></i> File hilang
+                                                        </span>
                                                     <?php else: ?>
-                                                        <span class="text-muted"><i class="bi bi-file-earmark-x"></i> Belum ada</span>
+                                                        <a href="sertifikat.php?id=<?= $p['id_prestasi'] ?>" 
+                                                           class="btn btn-sm btn-outline-success" 
+                                                           title="Buka sertifikat & download">
+                                                            <i class="bi bi-download"></i> <small>Download</small>
+                                                        </a>
                                                     <?php endif; ?>
                                                 </td>
+
                                                 <td>
                                                     <div class="d-flex gap-1 justify-content-start">
                                                         <a href="sertifikat.php?id=<?= $p['id_prestasi'] ?>" 
@@ -652,6 +657,7 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
         </div>
     </div>
 
+    <!-- Modal Tambah/Edit Prestasi -->
     <div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
@@ -668,7 +674,7 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
                         <?php if ($isEdit): ?>
                             <input type="hidden" name="id_prestasi" value="<?= $dataEdit['id_prestasi'] ?>">
                             <input type="hidden" name="id_sertifikat" value="<?= $dataEdit['id_sertifikat'] ?? 0 ?>">
-                            <input type="hidden" name="bukti_lama" value="<?= $dataEdit['bukti_sertifikat'] ?? '' ?>">
+                            <input type="hidden" name="bukti_lama" value="<?= htmlspecialchars($dataEdit['bukti_sertifikat'] ?? '') ?>">
                         <?php endif; ?>
                         
                         <div class="mb-3">
@@ -739,17 +745,18 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
         </div>
     </div>
 
+    <!-- Modal Detail Bukti -->
     <div class="modal fade modal-detail-bukti" id="modalDetailBukti" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        <i class="bi bi-file-pdf me-2 text-danger"></i> Detail Bukti Sertifikat
+                        <i class="bi bi-file-earmark-text me-2 text-success"></i> Detail Bukti Sertifikat
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="detailBuktiBody">
-                    <div class="text-center text-secondary">
+                    <div class="text-center text-secondary py-5">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -781,6 +788,7 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
                 }
             });
 
+            // Search
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.addEventListener('keyup', function() {
@@ -793,6 +801,7 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
                 });
             }
 
+            // Filter Kategori
             const filterKategori = document.getElementById('filterKategori');
             if (filterKategori) {
                 filterKategori.addEventListener('change', function() {
@@ -800,11 +809,7 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
                     const rows = document.querySelectorAll('table tbody tr');
                     rows.forEach(row => {
                         const text = row.textContent.toLowerCase();
-                        if (filterText === '') {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = text.includes(filterText) ? '' : 'none';
-                        }
+                        row.style.display = (filterText === '' || text.includes(filterText)) ? '' : 'none';
                     });
                 });
             }
@@ -815,14 +820,17 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
             <?php endif; ?>
         });
 
+        // ===== FUNGSI DETAIL BUKTI =====
         function detailBukti(filename) {
-            const modal = new bootstrap.Modal(document.getElementById('modalDetailBukti'));
+            const modalEl = document.getElementById('modalDetailBukti');
+            const modal = new bootstrap.Modal(modalEl);
             const body = document.getElementById('detailBuktiBody');
             
             const filePath = '../uploads/bukti/' + filename;
+            const lower = filename.toLowerCase();
             
             body.innerHTML = `
-                <div class="text-center text-secondary">
+                <div class="text-center text-secondary py-5">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
@@ -830,13 +838,31 @@ $isEdit = isset($dataEdit) && $dataEdit !== null;
                 </div>
             `;
             
-            setTimeout(function() {
-                body.innerHTML = `
-                    <iframe src="${filePath}" style="width:100%; height:75vh; border:none; border-radius:8px;"></iframe>
-                `;
-            }, 300);
-            
             modal.show();
+            
+            setTimeout(function() {
+                if (lower.endsWith('.html') || lower.endsWith('.htm') || lower.endsWith('.pdf')) {
+                    body.innerHTML = `
+                        <iframe src="${filePath}" style="width:100%; height:75vh; border:none; background: white;"></iframe>
+                    `;
+                } else if (/\.(jpg|jpeg|png|gif|webp)$/i.test(lower)) {
+                    body.innerHTML = `
+                        <div style="padding: 20px; text-align:center;">
+                            <img src="${filePath}" style="max-width: 100%; max-height: 70vh; border-radius: 8px;">
+                        </div>
+                    `;
+                } else {
+                    body.innerHTML = `
+                        <div class="text-center text-secondary py-5">
+                            <i class="bi bi-file-earmark-x fs-1 d-block mb-3"></i>
+                            <p>Preview tidak tersedia untuk tipe file ini.</p>
+                            <a href="${filePath}" download class="btn btn-primary">
+                                <i class="bi bi-download me-1"></i> Download File
+                            </a>
+                        </div>
+                    `;
+                }
+            }, 300);
         }
     </script>
 

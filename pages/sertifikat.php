@@ -21,14 +21,14 @@ if (!$prestasi || empty($prestasi['nomor_sertifikat'])) {
 $sertifikat = getSertifikat($prestasi['id_sertifikat']);
 
 $data = [
-    'id_prestasi' => $prestasi['id_prestasi'],
-    'id_sertifikat' => $prestasi['id_sertifikat'],
-    'nomor' => $prestasi['nomor_sertifikat'],
-    'nama_pemuda' => $prestasi['nama_pemuda'],
-    'nama_prestasi' => $prestasi['nama_prestasi'],
-    'tingkat' => $prestasi['tingkat'],
-    'penyelenggara' => $prestasi['penyelenggara'],
-    'tahun' => $prestasi['tahun'],
+    'id_prestasi'    => $prestasi['id_prestasi'],
+    'id_sertifikat'  => $prestasi['id_sertifikat'],
+    'nomor'          => $prestasi['nomor_sertifikat'],
+    'nama_pemuda'    => $prestasi['nama_pemuda'],
+    'nama_prestasi'  => $prestasi['nama_prestasi'],
+    'tingkat'        => $prestasi['tingkat'],
+    'penyelenggara'  => $prestasi['penyelenggara'],
+    'tahun'          => $prestasi['tahun'],
     'tanggal_terbit' => formatTanggal(date('Y-m-d'))
 ];
 
@@ -54,6 +54,8 @@ unset($_SESSION['success_message']);
             min-height: 100vh;
             color: #2D3E30;
         }
+
+        /* Sidebar */
         #sidebar-wrapper {
             min-height: 100vh;
             width: 250px;
@@ -111,6 +113,8 @@ unset($_SESSION['success_message']);
             color: #ff4d4d;
             font-weight: 600;
         }
+
+        /* Navbar */
         .navbar {
             background: rgba(255, 255, 255, 0.85) !important;
             border-bottom: 2px solid #fff;
@@ -122,12 +126,16 @@ unset($_SESSION['success_message']);
             color: #6B8F71;
             margin: 0;
         }
+
+        /* Card */
         .bg-white.rounded-4 {
             background-color: rgba(255, 255, 255, 0.85) !important;
             border: 2px solid #fff !important;
             border-radius: 16px !important;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
+
+        /* Buttons */
         .btn-primary {
             background-color: #6B8F71 !important;
             border-color: #6B8F71 !important;
@@ -153,153 +161,138 @@ unset($_SESSION['success_message']);
             color: #6B8F71 !important;
         }
 
+        /* SERTIFIKAT PREVIEW */
+        .sertifikat-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            padding: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
         .sertifikat-preview {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #ffffff;
-            border: 8px solid #6B8F71;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            padding: 50px;
-            position: relative;
-            min-height: 600px;
-            background-size: cover;
+            width: 297mm;
+            height: 210mm;
+            background-image: url('../assets/img/sertifikat.png');
+            background-size: 100% 100%;
             background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            flex-shrink: 0;
+            transform-origin: top center;
         }
-        .sertifikat-preview::before {
-            content: "";
+        .sertifikat-nomor {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            bottom: 15px;
-            border: 2px solid rgba(107, 143, 113, 0.3);
-            border-radius: 8px;
-            pointer-events: none;
+            top: 15mm;
+            right: 18mm;
+            font-size: 11pt;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2mm 5mm;
+            border-radius: 10mm;
+            font-weight: 600;
+            border: 0.5px solid rgba(107, 143, 113, 0.4);
+            z-index: 10;
         }
-        .sertifikat-preview .border-corner {
+        .sertifikat-content {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            border-color: #6B8F71;
-            border-style: solid;
-            border-width: 0;
-        }
-        .sertifikat-preview .border-corner.tl { top: 25px; left: 25px; border-top-width: 4px; border-left-width: 4px; }
-        .sertifikat-preview .border-corner.tr { top: 25px; right: 25px; border-top-width: 4px; border-right-width: 4px; }
-        .sertifikat-preview .border-corner.bl { bottom: 25px; left: 25px; border-bottom-width: 4px; border-left-width: 4px; }
-        .sertifikat-preview .border-corner.br { bottom: 25px; right: 25px; border-bottom-width: 4px; border-right-width: 4px; }
-        .sertifikat-preview .logo {
-            position: absolute;
-            top: 40px;
-            left: 50px;
-            width: 80px;
-            height: auto;
-        }
-        .sertifikat-preview .logo img {
-            width: 80px;
-            height: auto;
-        }
-        .sertifikat-preview .nomor {
-            position: absolute;
-            top: 45px;
-            right: 50px;
-            font-size: 13px;
-            color: #666;
-            background: #f0f0f0;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 500;
-        }
-        .sertifikat-preview .title {
-            font-size: 32px;
-            font-weight: bold;
-            color: #2D3E30;
-            margin-top: 60px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
+            inset: 0;
+            padding: 25mm 30mm;
             text-align: center;
         }
-        .sertifikat-preview .title-decoration {
-            width: 80px;
-            height: 3px;
+        .sertifikat-title {
+            font-size: 32pt;
+            font-weight: 900;
+            color: #2D3E30;
+            letter-spacing: 10pt;
+            text-transform: uppercase;
+            margin-top: 8mm;
+            line-height: 1.1;
+        }
+        .sertifikat-subtitle {
+            font-size: 18pt;
+            font-weight: 700;
+            color: #6B8F71;
+            letter-spacing: 6pt;
+            text-transform: uppercase;
+            margin-top: 1mm;
+        }
+        .sertifikat-decoration {
+            width: 25mm;
+            height: 1mm;
             background: #6B8F71;
-            margin: 10px auto;
+            margin: 3mm auto 5mm auto;
         }
-        .sertifikat-preview .subtitle {
-            font-size: 16px;
-            color: #666;
-            margin-top: 5px;
-            text-align: center;
+        .sertifikat-diberikan {
+            font-size: 12pt;
+            color: #777;
+            letter-spacing: 2pt;
+            margin-bottom: 2mm;
         }
-        .sertifikat-preview .nama-pemuda {
-            font-size: 48px;
-            font-weight: bold;
+        .sertifikat-nama {
+            font-size: 34pt;
+            font-weight: 900;
             color: #2D3E30;
-            margin: 25px 0 10px 0;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            text-align: center;
+            letter-spacing: 3pt;
+            line-height: 1.15;
+            margin: 2mm 0 4mm 0;
         }
-        .sertifikat-preview .prestasi-text {
-            font-size: 20px;
+        .sertifikat-atas {
+            font-size: 12pt;
             color: #4A6B5A;
-            margin: 5px 0;
-            text-align: center;
+            margin-bottom: 1mm;
         }
-        .sertifikat-preview .prestasi-text strong {
+        .sertifikat-prestasi {
+            font-size: 18pt;
+            font-weight: 700;
             color: #2D3E30;
+            margin-bottom: 4mm;
+            line-height: 1.2;
         }
-        .sertifikat-preview .detail-info {
-            font-size: 15px;
+        .sertifikat-detail {
+            font-size: 11pt;
             color: #555;
-            margin: 4px 0;
-            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 0.5mm;
         }
-        .sertifikat-preview .detail-info span {
+        .sertifikat-detail span {
             color: #6B8F71;
             font-weight: 600;
         }
-        .sertifikat-preview .footer {
+        .sertifikat-footer {
             position: absolute;
-            bottom: 50px;
-            left: 50px;
-            right: 50px;
+            bottom: 15mm;
+            left: 30mm;
+            right: 30mm;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid #e0e0e0;
-            padding-top: 20px;
+            border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+            padding-top: 3mm;
         }
-        .sertifikat-preview .footer .date {
-            font-size: 13px;
+        .sertifikat-footer .date {
+            font-size: 10pt;
             color: #888;
         }
-        .sertifikat-preview .footer .stamp {
-            font-family: "Brush Script MT", cursive;
-            font-size: 22px;
+        .sertifikat-footer .stamp {
+            font-family: "Brush Script MT", "Segoe Script", cursive;
+            font-size: 16pt;
             color: #6B8F71;
-            opacity: 0.7;
+            opacity: 0.85;
         }
 
-        .verifikasi-data {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
+        /* Responsive scale */
+        @media (max-width: 1400px) {
+            .sertifikat-preview { transform: scale(0.85); margin-bottom: -30mm; }
         }
-        .verifikasi-data .label {
-            font-weight: 600;
-            color: #6B8F71;
+        @media (max-width: 1200px) {
+            .sertifikat-preview { transform: scale(0.7); margin-bottom: -60mm; }
         }
-        .verifikasi-data .row {
-            padding: 4px 0;
-            border-bottom: 1px solid #eee;
+        @media (max-width: 992px) {
+            .sertifikat-preview { transform: scale(0.55); margin-bottom: -95mm; }
         }
-        .verifikasi-data .row:last-child {
-            border-bottom: none;
-        }
-
         @media (max-width: 768px) {
             #sidebar-wrapper {
                 width: 0;
@@ -311,46 +304,24 @@ unset($_SESSION['success_message']);
             #sidebar-wrapper.show {
                 width: 250px;
             }
-            .sertifikat-preview {
-                padding: 20px;
-                min-height: 400px;
-            }
-            .sertifikat-preview .logo {
-                position: relative;
-                top: 0;
-                left: 0;
-                margin: 0 auto 10px;
-                display: block;
-            }
-            .sertifikat-preview .nomor {
-                position: relative;
-                top: 0;
-                right: 0;
-                display: inline-block;
-                margin: 10px auto;
-            }
-            .sertifikat-preview .nama-pemuda {
-                font-size: 28px;
-            }
-            .sertifikat-preview .title {
-                font-size: 22px;
-                margin-top: 20px;
-            }
-            .sertifikat-preview .footer {
-                position: relative;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                margin-top: 20px;
-                flex-direction: column;
-                gap: 10px;
-            }
+            .sertifikat-preview { transform: scale(0.38); margin-bottom: -130mm; }
+        }
+        @media (max-width: 576px) {
+            .sertifikat-preview { transform: scale(0.3); margin-bottom: -148mm; }
+        }
+
+        .verifikasi-data {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
 
     <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
         <div class="sidebar text-white" id="sidebar-wrapper">
             <div class="sidebar-heading text-center">
                 <div class="sidebar-logo">
@@ -380,6 +351,7 @@ unset($_SESSION['success_message']);
             </div>
         </div>
 
+        <!-- Page Content -->
         <div id="page-content-wrapper" class="w-100">
             <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4">
                 <div class="d-flex align-items-center">
@@ -412,7 +384,7 @@ unset($_SESSION['success_message']);
                         <div class="col-12">
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                 <i class="bi bi-check-circle me-2"></i>
-                                <?= $successMessage ?>
+                                <?= htmlspecialchars($successMessage) ?>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         </div>
@@ -424,53 +396,41 @@ unset($_SESSION['success_message']);
                         <div class="bg-white rounded-4 shadow-sm p-4 mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="fw-bold mb-0">
-                                    <i class="bi bi-file-pdf text-success me-2"></i>
+                                    <i class="bi bi-file-earmark-text text-success me-2"></i>
                                     Preview Sertifikat
                                 </h5>
-                                <span class="badge bg-success"><?= $data['nomor'] ?></span>
+                                <span class="badge bg-success"><?= htmlspecialchars($data['nomor']) ?></span>
                             </div>
 
-                            <!-- Sertifikat Preview dengan background template -->
-                            <div class="sertifikat-preview" style="background-image: url('../assets/img/sertifikat.png');">
-                                <div class="border-corner tl"></div>
-                                <div class="border-corner tr"></div>
-                                <div class="border-corner bl"></div>
-                                <div class="border-corner br"></div>
+                            <!-- SERTIFIKAT PREVIEW -->
+                            <div class="sertifikat-wrapper">
+                                <div class="sertifikat-preview">
+                                    <div class="sertifikat-nomor">No: <?= htmlspecialchars($data['nomor']) ?></div>
 
-                                <div class="logo">
-                                    <img src="../assets/img/logo.png" alt="Logo">
-                                </div>
-                                <div class="nomor">No: <?= $data['nomor'] ?></div>
+                                    <div class="sertifikat-content">
+                                        <div class="sertifikat-title">Sertifikat</div>
+                                        <div class="sertifikat-subtitle">Penghargaan</div>
+                                        <div class="sertifikat-decoration"></div>
 
-                                <!-- # SERTIFIKAT -->
-                                <div class="title">Sertifikat</div>
-                                
-                                <!-- ## PENGHARGAAN -->
-                                <div class="title-decoration"></div>
-                                <div style="font-size: 26px; font-weight: 700; color: #6B8F71; letter-spacing: 6px; text-transform: uppercase; text-align: center;">Penghargaan</div>
-                                
-                                <!-- Diberikan kepada -->
-                                <div class="subtitle">Diberikan kepada</div>
+                                        <div class="sertifikat-diberikan">Diberikan kepada</div>
+                                        <div class="sertifikat-nama"><?= strtoupper(htmlspecialchars($data['nama_pemuda'])) ?></div>
 
-                                <!-- Nama Pemuda -->
-                                <div class="nama-pemuda"><?= strtoupper($data['nama_pemuda']) ?></div>
+                                        <div class="sertifikat-atas">Atas prestasi</div>
+                                        <div class="sertifikat-prestasi">"<?= htmlspecialchars($data['nama_prestasi']) ?>"</div>
 
-                                <!-- Prestasi -->
-                                <div style="font-size: 18px; color: #4A6B5A; text-align: center;">Atas prestasi</div>
-                                <div class="prestasi-text"><strong>"<?= $data['nama_prestasi'] ?>"</strong></div>
+                                        <div class="sertifikat-detail">
+                                            Tingkat: <span><?= htmlspecialchars($data['tingkat']) ?></span> &nbsp;|&nbsp; 
+                                            Penyelenggara: <span><?= htmlspecialchars($data['penyelenggara']) ?></span>
+                                        </div>
+                                        <div class="sertifikat-detail">
+                                            Tahun: <span><?= htmlspecialchars($data['tahun']) ?></span>
+                                        </div>
+                                    </div>
 
-                                <!-- Detail -->
-                                <div class="detail-info">
-                                    Tingkat: <span><?= $data['tingkat'] ?></span> &nbsp;|&nbsp; 
-                                    Penyelenggara: <span><?= $data['penyelenggara'] ?></span>
-                                </div>
-                                <div class="detail-info">
-                                    Tahun: <span><?= $data['tahun'] ?></span>
-                                </div>
-
-                                <div class="footer">
-                                    <div class="date">Diterbitkan: <?= $data['tanggal_terbit'] ?></div>
-                                    <div class="stamp">~ Pemuda Berprestasi ~</div>
+                                    <div class="sertifikat-footer">
+                                        <div class="date">Diterbitkan: <?= htmlspecialchars($data['tanggal_terbit']) ?></div>
+                                        <div class="stamp">~ Pemuda Berprestasi ~</div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -479,7 +439,7 @@ unset($_SESSION['success_message']);
                                 <button type="button" class="btn btn-success btn-lg px-5" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#modalVerifikasiDownload">
-                                    <i class="bi bi-file-pdf me-2"></i> Download Sertifikat
+                                    <i class="bi bi-download me-2"></i> Download Sertifikat
                                 </button>
                                 <a href="prestasi.php" class="btn btn-outline-secondary btn-lg px-4">
                                     <i class="bi bi-arrow-left me-2"></i> Kembali
@@ -507,7 +467,7 @@ unset($_SESSION['success_message']);
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="Download_sertifikat.php" method="POST">
+                <form action="Download_sertifikat.php" method="POST" target="_blank">
                     <div class="modal-body">
                         <div class="alert alert-warning">
                             <i class="bi bi-exclamation-triangle me-2"></i>
@@ -519,21 +479,21 @@ unset($_SESSION['success_message']);
                                 <label class="form-label fw-semibold">Nomor Sertifikat <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="verifNomor" 
                                         placeholder="Masukkan nomor sertifikat" required>
-                                <small class="text-muted">Masukkan: <strong><?= $data['nomor'] ?></strong></small>
+                                <small class="text-muted">Masukkan: <strong><?= htmlspecialchars($data['nomor']) ?></strong></small>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Nama Pemuda <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="verifNama" 
                                         placeholder="Masukkan nama pemuda" required>
-                                <small class="text-muted">Masukkan: <strong><?= $data['nama_pemuda'] ?></strong></small>
+                                <small class="text-muted">Masukkan: <strong><?= htmlspecialchars($data['nama_pemuda']) ?></strong></small>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Nama Prestasi <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="verifPrestasi" 
                                         placeholder="Masukkan nama prestasi" required>
-                                <small class="text-muted">Masukkan: <strong><?= $data['nama_prestasi'] ?></strong></small>
+                                <small class="text-muted">Masukkan: <strong><?= htmlspecialchars($data['nama_prestasi']) ?></strong></small>
                             </div>
                         </div>
 
@@ -552,7 +512,7 @@ unset($_SESSION['success_message']);
                             <i class="bi bi-x-circle me-1"></i> Batal
                         </button>
                         <button type="submit" class="btn btn-success" id="btnDownloadSertifikat" disabled>
-                            <i class="bi bi-file-pdf me-1"></i> Verifikasi & Download
+                            <i class="bi bi-download me-1"></i> Verifikasi & Download
                         </button>
                     </div>
                 </form>
@@ -572,12 +532,14 @@ unset($_SESSION['success_message']);
             }
 
             document.addEventListener('click', function(event) {
+                if (!menuToggle || !sidebarWrapper) return;
                 const isClickInside = sidebarWrapper.contains(event.target) || menuToggle.contains(event.target);
                 if (!isClickInside && window.innerWidth <= 768) {
                     sidebarWrapper.classList.remove('show');
                 }
             });
 
+            // VALIDASI FORM VERIFIKASI
             const verifNomor = document.getElementById('verifNomor');
             const verifNama = document.getElementById('verifNama');
             const verifPrestasi = document.getElementById('verifPrestasi');
@@ -585,9 +547,9 @@ unset($_SESSION['success_message']);
             const btnDownload = document.getElementById('btnDownloadSertifikat');
 
             const dataAsli = {
-                nomor: '<?= $data['nomor'] ?>',
-                nama: '<?= $data['nama_pemuda'] ?>',
-                prestasi: '<?= $data['nama_prestasi'] ?>'
+                nomor: '<?= addslashes($data['nomor']) ?>',
+                nama: '<?= addslashes($data['nama_pemuda']) ?>',
+                prestasi: '<?= addslashes($data['nama_prestasi']) ?>'
             };
 
             function validateForm() {
@@ -596,26 +558,24 @@ unset($_SESSION['success_message']);
                 const prestasiValid = verifPrestasi.value.trim() === dataAsli.prestasi;
                 const checkboxChecked = verifikasiCheck.checked;
 
-                if (nomorValid && namaValid && prestasiValid && checkboxChecked) {
-                    btnDownload.disabled = false;
-                } else {
-                    btnDownload.disabled = true;
-                }
+                btnDownload.disabled = !(nomorValid && namaValid && prestasiValid && checkboxChecked);
             }
 
-            verifNomor.addEventListener('input', validateForm);
-            verifNama.addEventListener('input', validateForm);
-            verifPrestasi.addEventListener('input', validateForm);
-            verifikasiCheck.addEventListener('change', validateForm);
+            if (verifNomor && verifNama && verifPrestasi && verifikasiCheck && btnDownload) {
+                verifNomor.addEventListener('input', validateForm);
+                verifNama.addEventListener('input', validateForm);
+                verifPrestasi.addEventListener('input', validateForm);
+                verifikasiCheck.addEventListener('change', validateForm);
+            }
 
             const modalVerifikasi = document.getElementById('modalVerifikasiDownload');
             if (modalVerifikasi) {
                 modalVerifikasi.addEventListener('show.bs.modal', function() {
-                    verifNomor.value = '';
-                    verifNama.value = '';
-                    verifPrestasi.value = '';
-                    verifikasiCheck.checked = false;
-                    btnDownload.disabled = true;
+                    if (verifNomor) verifNomor.value = '';
+                    if (verifNama) verifNama.value = '';
+                    if (verifPrestasi) verifPrestasi.value = '';
+                    if (verifikasiCheck) verifikasiCheck.checked = false;
+                    if (btnDownload) btnDownload.disabled = true;
                 });
             }
         });
