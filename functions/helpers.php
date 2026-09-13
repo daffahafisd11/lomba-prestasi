@@ -219,11 +219,15 @@ function saveBuktiSertifikat($id_sertifikat, $data) {
         mkdir($dir, 0777, true);
     }
     
-    $namaFile = 'sertifikat-' . $data['nomor'] . '.html';
+    $namaFile = 'sertifikat-' . $data['nomor'] . '.pdf';
     $filePath = $dir . $namaFile;
     
-    $bgUrl = '../assets/img/sertifikat.png';
-    $logoUrl = '../assets/img/logo.png';
+    $backgroundPath = __DIR__ . '/../assets/img/section-2.png';
+    $backgroundData = file_exists($backgroundPath)
+        ? 'data:image/png;base64,' . base64_encode(file_get_contents($backgroundPath))
+        : '';
+    $bgUrl = $backgroundData;
+    $logoUrl = '../../assets/img/logo.png';
     
     $html = '<!DOCTYPE html>
 <html lang="id">
@@ -454,7 +458,7 @@ function saveBuktiSertifikat($id_sertifikat, $data) {
                 }
             } else {
                 // Dibuka di tab baru → langsung ke prestasi.php
-                window.location.href = "prestasi.php";
+                window.location.href = "../../pages/prestasi.php";
             }
         }
     </script>
@@ -462,7 +466,34 @@ function saveBuktiSertifikat($id_sertifikat, $data) {
 </body>
 </html>';
     
-    file_put_contents($filePath, $html);
+    // PDF hanya berisi sertifikat, tanpa tombol dan petunjuk halaman HTML.
+    $pdfStyles = '
+        @page { size: A4 landscape; margin: 0; }
+        html, body {
+            width: 297mm;
+            height: 210mm;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden;
+        }
+        .sertifikat-page {
+            width: 297mm !important;
+            height: 210mm !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+        }
+        .no-print { display: none !important; }
+    ';
+    $html = str_replace('</style>', $pdfStyles . '</style>', $html);
+
+    require_once __DIR__ . '/../vendor/autoload.php';
+    $options = new \Dompdf\Options();
+    $options->set('isRemoteEnabled', false);
+    $dompdf = new \Dompdf\Dompdf($options);
+    $dompdf->loadHtml($html, 'UTF-8');
+    $dompdf->setPaper('A4', 'landscape');
+    $dompdf->render();
+    file_put_contents($filePath, $dompdf->output());
     
     // Update DB dengan nama file bukti
     $namaFileEscaped = mysqli_real_escape_string($GLOBALS['conn'], $namaFile);

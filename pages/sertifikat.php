@@ -172,7 +172,7 @@ unset($_SESSION['success_message']);
         .sertifikat-preview {
             width: 297mm;
             height: 210mm;
-            background-image: url('../assets/img/sertifikat.png');
+            background-image: url('../assets/img/section-2.png');
             background-size: 100% 100%;
             background-position: center;
             background-repeat: no-repeat;
@@ -477,21 +477,21 @@ unset($_SESSION['success_message']);
                         <div class="verifikasi-data">
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Nomor Sertifikat <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="verifNomor" 
+                                <input type="text" class="form-control" id="verifNomor" name="verif_nomor"
                                         placeholder="Masukkan nomor sertifikat" required>
                                 <small class="text-muted">Masukkan: <strong><?= htmlspecialchars($data['nomor']) ?></strong></small>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Nama Pemuda <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="verifNama" 
+                                <input type="text" class="form-control" id="verifNama" name="verif_nama"
                                         placeholder="Masukkan nama pemuda" required>
                                 <small class="text-muted">Masukkan: <strong><?= htmlspecialchars($data['nama_pemuda']) ?></strong></small>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Nama Prestasi <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="verifPrestasi" 
+                                <input type="text" class="form-control" id="verifPrestasi" name="verif_prestasi"
                                         placeholder="Masukkan nama prestasi" required>
                                 <small class="text-muted">Masukkan: <strong><?= htmlspecialchars($data['nama_prestasi']) ?></strong></small>
                             </div>

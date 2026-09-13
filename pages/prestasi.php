@@ -71,37 +71,55 @@ if (isset($_POST['update'])) {
     $tingkat = sanitize($_POST['tingkat']);
     $penyelenggara = sanitize($_POST['penyelenggara']);
     $tahun = (int)$_POST['tahun'];
-    $id_sertifikat = isset($_POST['id_sertifikat']) ? (int)$_POST['id_sertifikat'] : 0;
+    $prestasiLama = getPrestasi($id);
+    $id_sertifikat = (int)($prestasiLama['id_sertifikat'] ?? 0);
 
-    $sql = "UPDATE tb_prestasi SET 
-            id_pemuda = $id_pemuda, 
-            id_kategori = $id_kategori, 
-            nama_prestasi = '$nama_prestasi',
-            tingkat = '$tingkat', 
-            penyelenggara = '$penyelenggara', 
-            tahun = $tahun
-            WHERE id_prestasi = $id";
-
-    if (mysqli_query($conn, $sql)) {
-        if ($id_sertifikat > 0) {
-            $pemuda = getPemuda($id_pemuda);
-            $sertifikatData = [
-                'nama_prestasi' => $nama_prestasi,
-                'nama_pemuda'   => $pemuda['nama_pemuda'],
-                'tingkat'       => $tingkat,
-                'penyelenggara' => $penyelenggara,
-                'tahun'         => $tahun,
-                'bukti'         => $_POST['bukti_lama'] ?? ''
-            ];
-            updateSertifikat($id_sertifikat, $sertifikatData);
-        }
-
-        $message = 'Data prestasi berhasil diupdate!';
-        $messageType = 'success';
-        $dataEdit = null;
-    } else {
-        $message = 'Gagal mengupdate data: ' . mysqli_error($conn);
+    if (!$prestasiLama) {
+        $message = 'Data prestasi tidak ditemukan.';
         $messageType = 'danger';
+    } else {
+        $sql = "UPDATE tb_prestasi SET
+            id_pemuda = $id_pemuda,
+            id_kategori = $id_kategori,
+                nama_prestasi = '$nama_prestasi',
+            tingkat = '$tingkat',
+            penyelenggara = '$penyelenggara',
+                tahun = $tahun
+                WHERE id_prestasi = $id";
+
+        if (mysqli_query($conn, $sql)) {
+            $pemuda = getPemuda($id_pemuda);
+            $sertifikatUpdated = true;
+
+            if ($id_sertifikat > 0 && $pemuda) {
+                $sertifikatData = [
+                    'nomor'          => $prestasiLama['nomor_sertifikat'],
+                    'nama_prestasi'  => $nama_prestasi,
+                    'nama_pemuda'    => $pemuda['nama_pemuda'],
+                    'tingkat'        => $tingkat,
+                    'penyelenggara'  => $penyelenggara,
+                    'tahun'          => $tahun,
+                    'tanggal_terbit' => formatTanggal(date('Y-m-d'))
+                ];
+
+                $sertifikatUpdated = updateSertifikat($id_sertifikat, $sertifikatData);
+                if ($sertifikatUpdated) {
+                    saveBuktiSertifikat($id_sertifikat, $sertifikatData);
+                }
+            }
+
+            if ($sertifikatUpdated) {
+                $message = 'Data prestasi dan sertifikat berhasil diupdate!';
+                $messageType = 'success';
+                $dataEdit = null;
+            } else {
+                $message = 'Data prestasi berhasil diupdate, tetapi sertifikat gagal diperbarui.';
+                $messageType = 'warning';
+            }
+        } else {
+            $message = 'Gagal mengupdate data: ' . mysqli_error($conn);
+            $messageType = 'danger';
+        }
     }
 }
 
@@ -222,6 +240,10 @@ if (isset($_SESSION['success_message'])) {
             color: #fff;
             font-weight: 600;
         }
+        #sidebar-wrapper .list-group-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
         #sidebar-wrapper .list-group-item.text-danger {
             color: #ff4d4d;
             font-weight: 600;
@@ -280,6 +302,12 @@ if (isset($_SESSION['success_message'])) {
         .btn-outline-primary:hover {
             background-color: #6B8F71 !important;
             color: #fff !important;
+        }
+        .text-primary {
+            color: #6B8F71 !important;
+        }
+        .bg-primary.bg-opacity-10 {
+            background-color: rgba(107, 143, 113, 0.1) !important;
         }
         .btn-success {
             background-color: #28a745 !important;
