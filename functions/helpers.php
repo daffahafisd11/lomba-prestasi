@@ -55,8 +55,8 @@ function getPrestasi($id = null) {
     global $conn;
     if ($id) {
         $sql = "SELECT pr.*, p.nama_pemuda, k.nama_katgeori, 
-                       s.nomor_sertifikat, s.id_sertifikat, 
-                       s.bukti as bukti_sertifikat
+                        s.nomor_sertifikat, s.id_sertifikat, 
+                        s.bukti as bukti_sertifikat
                 FROM tb_prestasi pr 
                 JOIN tb_pemuda p ON pr.id_pemuda = p.id_pemuda 
                 LEFT JOIN tb_kategori k ON pr.id_kategori = k.id_kategori 

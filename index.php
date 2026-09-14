@@ -1162,11 +1162,6 @@ $pemudaLimit = array_slice($pemudaWithPrestasi, 0, 6);
                     <li class="nav-item">
                         <a class="nav-link" href="#tentang" data-section="tentang">Tentang</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-light text-primary px-3 ms-2 rounded-pill" href="pages/login.php">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>

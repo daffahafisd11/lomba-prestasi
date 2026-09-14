@@ -5,5 +5,5 @@ require_once 'config/database.php';
 session_destroy();
 
 // Redirect ke halaman login
-header("Location: pages/login.php");
+header("Location: index.php");
 exit();

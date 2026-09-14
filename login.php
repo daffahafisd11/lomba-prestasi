@@ -1,10 +1,9 @@
 <?php
-require_once '../config/database.php';
-require_once '../functions/helpers.php';
+require_once 'config/database.php';
+require_once 'functions/helpers.php';
 
-// Jika sudah login, redirect ke dashboard
 if (isLoggedIn()) {
-    redirect('dashboard.php');
+    redirect('pages/dahsboard.php');
 }
 
 $error = '';
@@ -12,41 +11,39 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = sanitize($_POST['username']);
     $password = sanitize($_POST['password']);
-    
-    // Hash password MD5 (sesuai database)
+
     $hashed_password = md5($password);
-    
-    // Gunakan prepared statement untuk mencegah SQL Injection
+
     $stmt = mysqli_prepare($conn, "SELECT * FROM tb_user WHERE username = ? AND password = ?");
     mysqli_stmt_bind_param($stmt, "ss", $username, $hashed_password);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    
-    if (mysqli_num_rows($result) === 1) {
+
+    if(mysqli_num_rows($result) === 1) {
         $user = mysqli_fetch_assoc($result);
         $_SESSION['user_id'] = $user['id_user'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['nama'] = $user['nama'];
-        redirect('dashboard.php');
+        redirect('pages/dashboard.php');
     } else {
-        $error = 'Username atau password salah!';
+        $error = 'Username atau Password Salah!';
     }
-    
+
     mysqli_stmt_close($stmt);
 }
 ?>
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Pemuda Berprestasi</title>
-    <link rel="icon" type="image/png" href="../assets/img/icon-1.png" sizes="32x32">
-    <link rel="stylesheet" href="../bootstrap-5.3.8-dist/css/bootstrap.min.css">
+    <link rel="icon" href="assets/img/icon-1.png" type="image/png" sizes="32x32">
+    <link rel="stylesheet" href="bootstrap-5.3.8-dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         body {
-            background-image: url('../assets/img/background-login.png');
+            background-image: url('assets/img/background-login.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -223,17 +220,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="row justify-content-center">
             <div class="col-md-5">
                 <div class="login-card">
-                    <!-- Header -->
                     <div class="login-header">
-                        <!-- Logo tanpa bundaran -->
                         <div class="login-logo">
-                            <img src="../assets/img/logo.png" alt="Logo Pemuda Berprestasi">
+                            <img src="assets/img/logo.png" alt="Logo Pemuda Berprestasi">
                         </div>
                         <h4 class="fw-bold mb-1">Pemuda Berprestasi</h4>
                         <p class="mb-0 opacity-75">Login</p>
                     </div>
-                    
-                    <!-- Body -->
+
                     <div class="login-body">
                         <?php if ($error): ?>
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -242,61 +236,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         <?php endif; ?>
-                        
-                        <form action="" method="POST">
+
+                        <form method="POST">
                             <div class="mb-3">
                                 <label for="username" class="form-label fw-semibold">Username</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-person"></i>
                                     </span>
-                                    <input type="text" 
-                                            class="form-control form-control-lg" 
-                                            id="username" 
-                                            name="username" 
-                                            placeholder="Masukkan username" 
-                                            required 
-                                            autofocus>
+                                    <input type="text" class="form-control form-control-lg" id="username" name="username" placeholder="Masukan Username" required autofocus>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label for="password" class="form-label fw-semibold">Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-lock"></i>
                                     </span>
-                                    <input type="password" 
-                                            class="form-control form-control-lg" 
-                                            id="password" 
-                                            name="password" 
-                                            placeholder="Masukkan password" 
-                                            required>
+                                    <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Masukan Password" required>
                                 </div>
                             </div>
-                            
+
                             <button type="submit" class="btn btn-login w-100">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Login
                             </button>
                         </form>
                     </div>
-                    
-                    <!-- Footer -->
                     <div class="login-footer">
-                        <a href="../index.php" class="text-decoration-none small">
-                            <i class="bi bi-arrow-left me-1"></i> Kembali ke Beranda
+                        <a href="index.php" class="text-decoration-none small">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Kembali ke Beranda
                         </a>
                     </div>
                 </div>
-                
-                <!-- Copyright di luar card -->
                 <div class="copyright">
-                    <p class="mb-0">&copy; <?= date('Y') ?> Pemuda Berprestasi - Made by <strong>Daffa Hafisd P</strong></p>
+                    <p class="mb-0">&copy; <?= date("Y") ?> Pemuda Berprestasi - Made by <strong>Daffa Hafisd P</strong></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="../bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
